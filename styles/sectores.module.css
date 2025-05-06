@@ -1,0 +1,97 @@
+.pageDiv {
+  width: 100%;
+  height: 99.9vh;
+  display: flex;
+  flex-direction: column;
+}
+.main{
+  flex-direction: column;
+}
+.AdminDiv {
+  width: 97.5vw;
+  height: 99.9vh;
+}
+.overlayContainer {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 7%; /* Ajusta la posición derecha según sea necesario */
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 12px;
+  color: rgb(255, 255, 255);
+  z-index: 999;
+  min-width: 15%;
+  max-width: 50%;
+  max-height: 90vh;
+  min-height: 0vh;
+  overflow-y: auto;
+  box-shadow: #868686 0px 0px 10px 0px;
+}
+.overlayContainerCluster {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 7%; /* Ajusta la posición derecha según sea necesario */
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 12px;
+  color: rgb(255, 255, 255);
+  z-index: 999;
+  min-width: 15%;
+  max-width: 50%;
+  max-height: 90vh;
+  min-height: 0vh;
+  overflow-y: auto;
+  box-shadow: #868686 0px 0px 10px 0px;
+}
+/* Estilos para motores Webkit y blink (Chrome, Safari, Opera... )*/
+.CardOverlay {
+  overflow-y: auto;
+}
+.CardOverlay::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+.CardOverlay::-webkit-scrollbar:vertical {
+  width:10px;
+}
+
+.CardOverlay::-webkit-scrollbar-button:increment,.CardOverlay::-webkit-scrollbar-button {
+  display: none;
+} 
+
+.CardOverlay::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+.CardOverlay::-webkit-scrollbar-thumb {
+  background-color: #aaaaaa;
+  border-radius: 20px;
+  border: 2px solid #f1f2f3;
+}
+
+.CardOverlay::-webkit-scrollbar-track {
+  border-radius: 10px;  
+}
+.markerListContainer {
+  max-height: 50%; /* Ajusta esto según tus necesidades */
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #334550eb; /* Fondo semitransparente, opcional */
+  border-radius: 8px; /* Estilo opcional */
+  margin: 10px;
+  align-self: center;
+}
+.btn {
+    display: block;
+  background-color: #ffffff;
+  width: 100%;
+  min-height: 20%;
+  color: #000000;
+  cursor: pointer;
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: #f1f1f1;
+  font-size: 100%;
+}
