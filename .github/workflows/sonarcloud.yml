@@ -21,3 +21,4 @@ jobs:
           projectKey: gpi-innovo
           organization: GPI-Requinoa
           token: ${{ secrets.SONAR_TOKEN }}
+          
