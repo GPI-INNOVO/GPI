@@ -18,6 +18,6 @@ jobs:
       - run: npm ci
       - uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
-          organization: ${{ secrets.SONAR_ORGANIZATION }}
-          token: ${{ secrets.SONAR_TOKEN }}
+          projectKey: gpi-innovo
+          organization: GPI-Requinoa
+          token: cc46718732008f2f74fbbc97e476f3db5270cc35
