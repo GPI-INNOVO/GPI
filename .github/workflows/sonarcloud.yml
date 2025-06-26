@@ -23,11 +23,11 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           # El secret que acabas de crear
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARTOKEN }}
         with:
           # Aquí pasas todos los parámetros de Sonar en un solo args
           args: >
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.organization=GPI-Requinoa
             -Dsonar.projectKey=gpi-innovo
-            -Dsonar.login=${{ env.SONAR_TOKEN }}
+            -Dsonar.login=${{ env.SONARTOKEN }}
