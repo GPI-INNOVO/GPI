@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface Direccion {
-    label: string;
+    label?: string;
     _id: number;
     LAT: number;
     LNG: number;

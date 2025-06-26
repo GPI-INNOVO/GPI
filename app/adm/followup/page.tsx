@@ -1,4 +1,6 @@
 "use client";
+import dynamic from 'next/dynamic';
+const Map = dynamic(() => import('@/components/Follow/Map_workers'), { ssr: false });
 export default function Admin_FollowUp() {
 
     return (
@@ -8,6 +10,7 @@ export default function Admin_FollowUp() {
       display: 'flex',
       flexDirection: 'row'
     }}>
+      <Map/>
     </div>
   );
 }

@@ -29,7 +29,7 @@ export default function Tab_Direccion() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSector, setSelectedSector] = useState<number | null>(null);
   const { token } = useAuth();
-  const { direcciones, setDirecciones} = useDireccion();
+  const {setDirecciones} = useDireccion();
   const list = useAsyncList<Rutas>({
     async load({ signal }) {
       if (!token) {
