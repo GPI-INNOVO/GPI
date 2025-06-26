@@ -9,7 +9,10 @@ const { TipoNotificacion } = require('../Model/tipoNotificacion_Mongoose.js');
 const {
     notificacion_vista_MongooseModel,
 } = require('../Model/notificacion_vista.Mongoose.js');
-
+const {
+    tipoDocumento_MongooseModel,
+} = require('../Model/tipoDocumento_Mongoose.js');
+const { documentos_MongooseModel } = require('../Model/documentos_Mongoose.js');
 const moment = require('moment-timezone');
 const Dayjs = require('dayjs');
 const admin = require('firebase-admin');
@@ -193,7 +196,7 @@ const crearNotificacionDocumento = async (req, res) => {
         try {
             let trabajadores;
             let objetivoArray = Array.isArray(objetivo) ? objetivo : JSON.parse(objetivo);
-            console.log('Objetivo:', objetivoArray);
+
             if (objetivoArray[0] === 'all') {
                 trabajadores = await trabajador_MongooseModel.find();
             } else {
@@ -201,7 +204,6 @@ const crearNotificacionDocumento = async (req, res) => {
                     Rut: { $in: objetivoArray },
                 });
             }
-            console.log('Trabajadores:', trabajadores);
             const archivo = req.file;
             const formatosPermitidos = [
                 'application/pdf',
@@ -216,7 +218,9 @@ const crearNotificacionDocumento = async (req, res) => {
                         'Formato de archivo no permitido: ' + archivo.mimetype
                     );
             }
-
+            const resTipodocumento = await tipoDocumento_MongooseModel.findOne({
+                value: 'Notificacion',
+            });
             const uploadPath = path.join(__dirname, '../../uploads');
             if (!fs.existsSync(uploadPath)) {
                 fs.mkdirSync(uploadPath, { recursive: true });
@@ -239,6 +243,14 @@ const crearNotificacionDocumento = async (req, res) => {
             } else {
                 fs.writeFileSync(finalPath, archivo.buffer);
             }
+            const nuevoDocumento = new documentos_MongooseModel({
+                _id: new mongoose.Types.ObjectId(),
+                tipo: resTipodocumento._id,
+                url: finalPath, // Ruta del archivo guardado (procesado si es imagen)
+                formato: archivo.mimetype,
+                fecha: moment().tz('America/Santiago'),
+            });
+            await nuevoDocumento.save();
 
             const trabajadoresIds = trabajadores.map(
                 (trabajador) => trabajador._id
@@ -256,12 +268,14 @@ const crearNotificacionDocumento = async (req, res) => {
 
             for (let trabajador of trabajadores) {
                 trabajador.notificaciones.push(nuevaNotificacion.id);
+                trabajador.documentos.push(nuevoDocumento._id);
                 let result = await pushNotification({
                     userId: trabajador._id,
                     titulo: titulo,
                     mensaje: mensaje,
                     data: {contenidos:contenido,
                         idNotificacion:nuevaNotificacion._id,
+                        tipo:resTipodocumento.value,
                         fecha:moment().tz('America/Santiago'),
                         url:finalPath||null},
                 });

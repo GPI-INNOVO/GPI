@@ -3,3 +3,4 @@ node_modules
 uploads
 google.services.json
 serviceAccountKey.json
+.next

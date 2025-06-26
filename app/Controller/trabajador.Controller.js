@@ -3,10 +3,15 @@ const key = 'clave';
 const { validate, format } = require('rut.js')
 const Correo = require('validator');
 const { trabajador_MongooseModel: TrabajadorModel } = require('../Model/trabajador_Mongoose.js');
+const TipoDocumento = require('../Model/tipoDocumento_Mongoose.js'); // Add this line
 const Token = require('../Controller/token.Controller.js')
+const {Permiso} = require('../Model/permiso_Mongoose.js');
+const { Rol } = require('../Model/rol_Mongoose.js');
 const { notificaciones_MongooseModel}= require('../Model/notificacion_Mongoose.js');
 const {notificacion_vista_MongooseModel}= require('../Model/notificacion_vista.Mongoose.js');
 const { TipoNotificacion } = require('../Model/tipoNotificacion_Mongoose.js');
+const { Novedad } = require('../Model/novedad_Mongose.js');
+const {Region} = require('../Model/region_Mongoose.js');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
@@ -52,12 +57,14 @@ const creartrabajador = async (req, res) => {
         if (!Correo.isEmail(correo)) {
             return res.status(405).send('El correo no es valido');
         }
+        const rol = await Rol.findOne({ nombre: cargo });
         const nvotrabajador = new TrabajadorModel({
             Rut: rut,
             Nombre: nombre,
             cargo,
             correo,
-            clave
+            clave,
+            rol: rol._id
         });
         await nvotrabajador.save();
         req.io.emit('nuevo-trabajador', nvotrabajador);
@@ -121,16 +128,25 @@ const eliminartrabajador = async (req, res) => {
 const login = async (req, res) => {
     const { rut, clave, ID, tokenPush} = req.body; // Asegúrate de que 'rut' y 'clave' son los nombres correctos que se envían desde el cliente
     try {
-        console.log('Iniciando sesión con:', rut, clave,ID, tokenPush);
+        // console.log('Iniciando sesión con:', rut, clave,ID, tokenPush);
         // Verificar que el usuario existe y que la clave es correcta
         const usuarioExistente = await TrabajadorModel.findOne({ Rut: rut, clave: clave });
         if (usuarioExistente) {
-
+            const rol = await Rol.findById(usuarioExistente.rol);
+            const permisos = await Promise.all(
+                rol.permisos.map(async permiso => {
+                    return await Permiso.findById(permiso, 'nombre descripcion');
+                })
+            );
+            const userData = {
+                nombre: rol.nombre,
+                permisos
+            };
             const tokenres = await Token.crearToken(req.body);
             usuarioExistente.tokenPush = tokenPush;
             usuarioExistente.ID = ID;
             await usuarioExistente.save();
-            return res.send(JSON.stringify({token: tokenres}));
+            return res.send(JSON.stringify({token: tokenres, rol:userData}));
         } else {
             return res.status(400).send('Correo o clave no proporcionados');
         }
@@ -178,7 +194,7 @@ const obtenerTrabajador = async (req, res) => {
         // Buscar al trabajador por su RUT y poblar las notificaciones
         const trabajador = await TrabajadorModel.findOne(
             { Rut: rut },
-            "Rut Nombre cargo apoyo correo notificaciones documentos "
+            "Rut Nombre cargo apoyo correo notificaciones documentos rol rolTemporal"
         ).populate({
             path: 'notificaciones',
             model: 'notificaciones', // Nombre del modelo de notificaciones
@@ -186,6 +202,14 @@ const obtenerTrabajador = async (req, res) => {
             populate: {
                 path: 'tipo', // Poblar el tipo de notificación
                 model: 'TipoNotificacion' // Nombre del modelo de tipos de notificación
+            }
+        }).populate({
+            path: 'documentos',
+            model: 'documentos', // Nombre del modelo de documentos
+            select: '_id tipo formato',
+            populate: {
+                path: 'tipo', // Poblar el tipo de documento
+                model: 'tipoDocumento' // Nombre del modelo de tipos de documento
             }
         });
 
@@ -207,7 +231,19 @@ const datosTrabajador = async (req, res) => {
         if (!tokenValido.valid) {
             return res.status(401).send('Token inválido');
         }
-        let trabajador = await TrabajadorModel.findOne({ Rut: rut })
+        let trabajador = await TrabajadorModel.findOne({ Rut: rut }).populate({
+            path: 'documentos',
+            model: 'documentos', // Nombre del modelo de documentos
+            populate: {
+            path: 'tipo',
+            model: 'tipoDocumento',
+            select: 'value'
+            }
+        }).populate({
+            path:"rol",
+            model:"Rol",
+            select:"_id nombre"
+        });
 
         trabajador.vistas.forEach(vista => {
             trabajador.notificaciones.push(vista);
@@ -232,6 +268,7 @@ const datosTrabajador = async (req, res) => {
 
             return modelo;
         }));
+        trabajador.novedades = await Novedad.find({emisor: trabajador._id}).populate('TipoNovedad').populate('direccion');
         trabajador.notificaciones = notificaciones;
         if (!trabajador) {
             return res.status(404).send('Trabajador no encontrado');
@@ -250,7 +287,19 @@ const datosApp = async (req, res) => {
         if (!tokenValido.valid) {
             return res.status(401).send('Token inválido');
         }
-        let trabajador = await TrabajadorModel.findOne({ Rut: tokenValido.token.rut })
+        let trabajador = await TrabajadorModel.findOne({ Rut: tokenValido.token.rut }).populate({
+            path: 'documentos',
+            model: 'documentos', // Nombre del modelo de documentos
+            populate: {
+            path: 'tipo',
+            model: 'tipoDocumento',
+            select: 'value'
+            }
+        }).populate({
+            path:"rol",
+            model:"Rol",
+            select:"_id nombre"
+        });
         trabajador = trabajador.toObject();
         //Credencial?????
         delete trabajador.clave;
@@ -328,8 +377,18 @@ const fotoTrabajador = async (req, res) => {
     }
 }
 
-
+const obtenerRegionChile = async (req,res) => {
+    const {lat,lng} = req.body;
+    const region = await Region.findOne({
+      "area.latMin": { $lte: lat },
+      "area.latMax": { $gte: lat },
+      "area.lngMin": { $lte: lng },
+      "area.lngMax": { $gte: lng }
+    });
+    // return region ? [region.indiceUV_h, region.indiceUV_m] : null;
+    res.send(region? [region.indiceUV_h, region.indiceUV_m] : null);
+};
   
 
 
-module.exports = {creartrabajador, modificardatostrabajador, eliminartrabajador, login, listarTrabajadores,obtenerTrabajador, updatePushToken,listarTrabajadoresConectados,datosTrabajador, datosApp,fotoTrabajador};
+module.exports = {obtenerRegionChile,creartrabajador, modificardatostrabajador, eliminartrabajador, login, listarTrabajadores,obtenerTrabajador, updatePushToken,listarTrabajadoresConectados,datosTrabajador, datosApp,fotoTrabajador};

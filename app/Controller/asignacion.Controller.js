@@ -9,6 +9,7 @@ const {
 const { ruta_MongooseModel: RUTA } = require('../Model/ruta_Mongoose.js');
 const { apoyo_MongooseModel } = require('../Model/apoyo.js');
 const {direccion_MongooseModel}= require('../Model/direccion_Mongoose.js')
+const {ate_MongooseModel}= require('../Model/ATE_Mongoose.js')
 const dayjs = require('dayjs');
 const Token = require('../Controller/token.Controller.js');
 
@@ -112,7 +113,12 @@ const obtenerAsigMes = async (req, res) => {
                     }
                     // console.log(asignacion.fecha_asignacion,dayjs(asignacion.fecha_asignacion).endOf('day').add(21,'hours').toDate())
                     const direcciones= await direccion_MongooseModel.find({NumeroSector:sector._id}).countDocuments();
-
+                    const ate= await ate_MongooseModel.find({Trabajador:trabajadorexiste._id,fecha_ate:{
+                        $gte:asignacion.fecha_asignacion,
+                        $lte:dayjs(asignacion.fecha_asignacion).endOf('day').add(21,'hours').toDate()
+                    },
+                    estado: { $ne: true },
+                }).countDocuments();
                     return {
                         ruta: ruta ? ruta.NumeroRuta : null, // Recupera el número de ruta
                         sector: sector ? sector.sector : null, // Recupera el nombre del sector
@@ -120,7 +126,8 @@ const obtenerAsigMes = async (req, res) => {
                             .utc()
                             .format('YYYY-MM-DD'),
                         tipo: asignacion.tipo,
-                        direcciones: direcciones
+                        direcciones: direcciones,
+                        ate:ate
                     };
                 })
             );
@@ -239,9 +246,9 @@ const asignarApoyo = async (req, res) => {
     const { token } = req.body;
     const tokenValido = await Token.validartoken(token);
     if (tokenValido.valid) {
-        const {  sector, fechainicio, fechafin } = req.body;
+        const { rut, sector, fechainicio, fechafin } = req.body;
         try {
-            const trabajadorExiste = await trabajador.findOne({ Rut: tokenValido.token.rut });
+            const trabajadorExiste = await trabajador.findOne({ Rut: rut });
             if (!trabajadorExiste) {
                 return res.status(404).send('Trabajador no encontrado');
             }

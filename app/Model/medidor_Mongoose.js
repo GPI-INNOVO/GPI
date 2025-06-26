@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const medidor_Mongoose = new mongoose.Schema({
-    NumeroMedidor:{ type: String, required: true},
+    NumeroMedidor:{ type: Number, required: true},
     NumeroCliente: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'cliente', 

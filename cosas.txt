@@ -1,0 +1,64 @@
+Crear novedades
+eliminar lecturas?
+ver que obtener de cliente
+
+MARTIN - scroll para ir visualizando la info completa
+MARTIN - especificar un poco mas la info que se muestra
+MARTIN - tener opciones para el indice uv (la serena, talca)
+
+SIFi - ver lo de las atenciones especiales
+BENJAMIN - rango 30 metros, para la direccion de las atenciones especiales
+
+MARTIN - que no se pueda desinstalar la app
+SOFI - que se vincule el inicio de sesion a un solo celular con token
+
+SOFI/MARTIN - sistema de seguridad para la cuenta
+SOFI - que se inhabilite la cuenta
+
+BENJAMIN - bloquear toda consulta back cuando se reporte
+SOFI - cambio dispositivo
+
+SOFI - ver funcionalidades de emergencia o tener una "app de emergencia"
+
+BENJAMIN - agrupar direcciones para los apoyos
+BENJAMIN - los sectores tienen que ser colindantes
+
+BENJAMIN - tirar direcciones a otros sectores
+
+BENJAMIN - revisar direcciones en el mapa para ver que se hace si la "o" o "lineal"
+
+MARTIN/ SIFUA - si tiene opcion de cerrado, tiene que sacar foto
+
+SOFI - ver todo el sistema de novedad
+
+SOFI - que se cambie a novedad cuando se cambie algo
+
+SOFI - Estado de novedad en la toma de lectura por error de lectura
+
+ver que tipo de seguridad se usar
+
+autorotular imagenes para los requerimientos
+SOFI/MARTIN - campo de observacion
+
+SOFI - atenciones especiales reparto siempre foto
+
+modulo distinto - automatizar el correo de las atenciones especiales
+                - modificacion
+                - notificacion
+ver el dominio, para crear correos a cada uno
+
+-mostrar perfil lector
+-info
+-uv
+-notificacion
+-calendario
+
+rotulacion correo
+modularizar home
+
+CORREO
+
+calendario de administracion con todo, pero solo nombre
+
+  git config --global user.email "benjamin.moralesc@alumnos.uv.cl"
+  git config --global user.name "Benjamin Morales"

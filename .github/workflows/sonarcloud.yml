@@ -1,0 +1,25 @@
+name: SonarCloud
+
+on:
+  push:
+    branches: [ backend ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Run SonarCloud scan
+        uses: sonarsource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: 7e29eed842bc39ebe369e87dd2dd620e8ad3bd85
+          SONAR_HOST_URL: 'https://sonarcloud.io'

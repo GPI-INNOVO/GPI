@@ -225,11 +225,11 @@ const listadirecciones=async(req,res)=>{
                 const direccionapoyo = await direccion.find(
                     { NumeroSector: ASIGNesapoyo.NumeroSector },
                     { _id: 0, calle: 1 }
-                ).populate('NumeroMedidor', 'NumeroMedidor _id');
+                ).populate('NumeroMedidor', 'NumeroMedidor -_id');
                 direcciones.push(direccionapoyo);
             }
             const direcciones2 = direcciones.map((direccion) => {
-                return {"calle":direccion.calle, "_id":direccion.NumeroMedidor._id,"NumeroMedidor":direccion.NumeroMedidor.NumeroMedidor.toString()};
+                return {"calle":direccion.calle, "_id":direccion.NumeroMedidor._id,"NumeroMedidor":direccion.NumeroMedidor.NumeroMedidor};
                 
             });
             res.send(direcciones2);
