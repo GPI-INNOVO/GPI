@@ -2,16 +2,11 @@
 
 import type React from "react";
 import { useState } from "react";
-import {
-  Input,
-  Select,
-  SelectItem,
-  Button,
-} from "@heroui/react";
+import { Input, Select, SelectItem, Button } from "@heroui/react";
 import { User, Mail, Lock } from "lucide-react";
 import { useRut } from "react-rut-formatter";
 import { crearTrabajador } from "@/api/adm/api";
-import { useAuth } from '@/app/AuthContext';
+import { useAuth } from "@/app/AuthContext";
 type FormData = {
   Rut: string;
   Nombre: string;
@@ -26,7 +21,7 @@ type FormErrors = {
 
 export function FormularioTrabajador() {
   const { rut, updateRut, isValid } = useRut();
-  const { token, socket} = useAuth();
+  const { token, socket } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     Rut: "",
     Nombre: "",
@@ -51,7 +46,7 @@ export function FormularioTrabajador() {
     }
     if (!formData.correo) {
       newErrors.correo = "El correo electrónico es requerido";
-    } else if (!/\S+@\S+\.\S+/.test(formData.correo)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) {
       newErrors.correo = "Correo electrónico inválido";
     }
     if (formData.clave.length < 6)
@@ -74,8 +69,14 @@ export function FormularioTrabajador() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
-        console.log("Formulario válido");
-        crearTrabajador(rut.raw,formData.Nombre, formData.cargo, formData.correo, formData.clave);
+      console.log("Formulario válido");
+      crearTrabajador(
+        rut.raw,
+        formData.Nombre,
+        formData.cargo,
+        formData.correo,
+        formData.clave
+      );
     } else {
       console.log("Formulario inválido");
     }
