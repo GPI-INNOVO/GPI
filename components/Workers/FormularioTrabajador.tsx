@@ -46,7 +46,9 @@ export function FormularioTrabajador() {
     }
     if (!formData.correo) {
       newErrors.correo = "El correo electrónico es requerido";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) {
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.correo)
+    ) {
       newErrors.correo = "Correo electrónico inválido";
     }
     if (formData.clave.length < 6)
