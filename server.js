@@ -22,6 +22,8 @@ const path = require('path');
 const axios = require('axios');
 const {pushNotification,crearNotificacion} = require('./app/Controller/notificaciones.Controller.js');
 const moment = require('moment-timezone');
+const key = process.env.JWT_SECRET;
+
 
 const ateatrasada = async () => {
   const trabajadores = await trabajador_MongooseModel.find();
@@ -120,7 +122,7 @@ app.use('/TRABAJADORES', express.static(path.join(__dirname, '../TRABAJADORES'))
 require('./app/Router/main.router')(app);
 
 const obtenerEstadoBot = (callback) => {
-  exec("python3 /home/backend/Innovo-app/Asistente/checker.py --status", (error, stdout, stderr) => {
+  exec("python3 ../Asistente/checker.py --status", (error, stdout, stderr) => {
     if (error) {
       console.error(`Error al ejecutar el script: ${error.message}`);
       callback(false); // Asume estado falso en caso de error
@@ -148,7 +150,7 @@ io.on('connection', (socket) => {
   // Evento para registrar conexión de un trabajador
   socket.on("registrarTrabajador", async ({ token, ubicacion }) => {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET); // Decodificar el token
+      const decoded = jwt.verify(token, key); // Decodificar el token
       const rut = decoded.rut; // Extraer el RUT del token
       if (!rut) {
         console.error("❌ No se pudo extraer el RUT del token.");
@@ -186,8 +188,8 @@ io.on('connection', (socket) => {
   socket.on("actualizarUbicacion",
     _.throttle(({ token, ubicacion }) => {
       try {
-        console.log(`📍 Actualizando ubicación para ${usuariosConectados[socket.id].nombre} (${usuariosConectados[socket.id].id_trabajador})`);
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(`🔄 Actualizando ubicación para ${usuariosConectados[socket.id]?.nombre || 'desconocido'})`);
+        const decoded = jwt.verify(token, key);
         const rut = decoded.rut;
         if (usuariosConectados[socket.id]) {
           usuariosConectados[socket.id].ubicacion = ubicacion;
@@ -213,7 +215,7 @@ io.on('connection', (socket) => {
   });
   socket.on('actualizarEstadoBot', (estado) => {
     if (estado) {
-      exec("python3 /home/backend/Innovo-app/Asistente/checker.py --start", (error, stdout, stderr) => {
+      exec("python3 ../Asistente/checker.py --start", (error, stdout, stderr) => {
         if (error) {
           console.error(`Error al ejecutar el script: ${error.message}`);
           return;
@@ -225,7 +227,7 @@ io.on('connection', (socket) => {
       }, 500);
     }
     else {
-      exec("python3 /home/backend/Innovo-app/Asistente/checker.py --stop", (error, stdout, stderr) => {
+      exec("python3 ../Asistente/checker.py --stop", (error, stdout, stderr) => {
         if (error) {
           console.error(`Error al ejecutar el script: ${error.message}`);
           return;

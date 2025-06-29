@@ -1,5 +1,10 @@
 const io = require("socket.io-client");
 const jwt = require("jsonwebtoken");
+const path = require('path');
+require('dotenv').config({
+  path: path.resolve(__dirname, '../.env')
+});
+const key = process.env.JWT_SECRET;
 
 // Configuración
 const SERVER_URL = process.env.SOCKET_SERVER || "http://localhost:3001";
@@ -23,7 +28,7 @@ const trabajadores = [
 
 // Simulación de generación de tokens JWT
 const generarToken = (rut) => {
-  return jwt.sign({ rut }, "clave", { expiresIn: "2h" }); // Usa la misma clave que el backend
+  return jwt.sign({ rut }, key, { expiresIn: "2h" });
 };
 
 // Función para generar coordenadas aleatorias dentro de un rango
