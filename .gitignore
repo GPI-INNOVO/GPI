@@ -4,7 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-
+sonar.sh
+/.scannerwork
 # testing
 /coverage
 

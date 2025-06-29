@@ -1,9 +1,9 @@
 name: SonarCloud Analysis
-
 on:
   push:
     branches:
       - main
+      - backend
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -12,12 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - run: npm ci
-      - uses: SonarSource/sonarcloud-github-action@v2
+
+      - name: Run SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectKey: gpi-innovo
-          organization: GPI-Requinoa
-          token: cc46718732008f2f74fbbc97e476f3db5270cc35
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
