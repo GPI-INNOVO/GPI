@@ -1,15 +1,14 @@
 name: SonarCloud Analysis
-
 on:
   push:
-    branches: [ backend ]
+    branches:
+      - backend
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -19,15 +18,9 @@ jobs:
 
       - run: npm ci
 
-      - name: SonarCloud Scan
+      - name: Run SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
-        env:
-          # El secret que acabas de crear
-          SONAR_TOKEN: ${{ secrets.SONARTOKEN }}
         with:
-          # Aquí pasas todos los parámetros de Sonar en un solo args
-          args: >
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.organization=GPI-Requinoa
-            -Dsonar.projectKey=gpi-innovo
-            -Dsonar.login=${{ env.SONARTOKEN }}
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
